@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <title>Wedding AR Experience</title>
 
-  <!-- IMPORTANT for iPhone -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
@@ -14,20 +11,17 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
-      background: black;
       font-family: Arial, sans-serif;
+      background: black;
     }
 
-    /* Landing Page */
     #landing {
       position: fixed;
-      inset: 0;
+      width: 100%;
+      height: 100%;
       background: black;
       display: flex;
       justify-content: center;
@@ -36,42 +30,34 @@
       z-index: 20;
     }
 
-    /* Thumbnail full screen */
     #thumbnail {
-      position: absolute;
-      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    /* iPhone 15 Optimized Button */
     #startButton {
       position: absolute;
-      bottom: calc(40px + env(safe-area-inset-bottom));
-      padding: 18px 40px;
-      font-size: 20px;
-      background: white;
-      color: black;
+      bottom: 40px;
+      padding: 20px 35px;
+      font-size: 18px;
+      background: #ffffff;
+      color: #000;
       border: none;
-      border-radius: 40px;
-      font-weight: bold;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      border-radius: 30px;
       cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       transition: 0.3s;
     }
 
-    #startButton:active {
-      transform: scale(0.95);
+    #startButton:hover {
       background: #83a759;
       color: white;
     }
 
-    /* AR Scene hidden initially */
     a-scene {
       display: none;
-      position: fixed !important;
-      inset: 0;
     }
   </style>
 </head>
@@ -99,16 +85,14 @@
   >
 
     <a-assets>
-      <!-- IMPORTANT: muted required for iPhone autoplay -->
       <video
         id="weddingVideo"
         src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
         preload="auto"
         loop
-        muted
+        crossorigin="anonymous"
         playsinline
         webkit-playsinline
-        crossorigin="anonymous"
       ></video>
     </a-assets>
 
@@ -117,13 +101,12 @@
     <!-- Marker Target -->
     <a-entity mindar-image-target="targetIndex: 0" id="target">
 
-      <!-- Marker-sized Video -->
-     <a-plane
-  position="0 0 0.01"
-  width="1"
-  height="0.5625"
-  material="shader: flat; src: #weddingVideo; transparent: true;"
-></a-plane>
+      <a-plane
+        position="0 0 0.01"
+        width="1"
+        height="1"
+        material="shader: flat; src: #weddingVideo"
+      ></a-plane>
 
     </a-entity>
 
@@ -138,8 +121,6 @@
 
     startButton.addEventListener("click", async () => {
       try {
-        // iPhone camera permission trigger
-        await navigator.mediaDevices.getUserMedia({ video: true });
 
         landing.style.display = "none";
         scene.style.display = "block";
