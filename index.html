@@ -120,12 +120,13 @@ startButton.addEventListener("click", async () => {
 
     const mindarSystem = scene.systems["mindar-image-system"];
 
-    // Start camera FIRST (important for Android)
+    // 1️⃣ Start camera FIRST (Android requirement)
     await mindarSystem.start();
 
-    // Unlock video for iOS AFTER camera starts
-    await video.play();
-    video.pause();
+    // 2️⃣ Unlock video safely (iOS requirement)
+    video.play().then(() => {
+      video.pause();
+    });
 
   } catch (err) {
     alert("Camera permission denied or not supported.");
