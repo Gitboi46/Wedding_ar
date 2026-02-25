@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <title>Wedding AR Experience</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-  <!-- MindAR -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
@@ -64,93 +61,86 @@
 
 <body>
 
-  <!-- Landing Page -->
-  <div id="landing">
-    <img 
-      id="thumbnail"
-      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/Web%20Home%20Page.png"
-      alt="Wedding AR Thumbnail"
-    >
-    <button id="startButton">Start AR Experience 💍</button>
-  </div>
-
-  <!-- AR Scene -->
-  <a-scene
-    id="arScene"
-    mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/target%201.mind; autoStart: false;"
-    color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
+<div id="landing">
+  <img 
+    id="thumbnail"
+    src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/Web%20Home%20Page.png"
+    alt="Wedding AR Thumbnail"
   >
+  <button id="startButton">Start AR Experience 💍</button>
+</div>
 
-    <a-assets>
-      <video
-        id="weddingVideo"
-        src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
-        preload="auto"
-        loop
-        muted
-        crossorigin="anonymous"
-        playsinline
-        webkit-playsinline
-      ></video>
-    </a-assets>
+<a-scene
+  id="arScene"
+  mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/target%201.mind; autoStart: false;"
+  color-space="sRGB"
+  renderer="colorManagement: true, physicallyCorrectLights"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <a-assets>
+    <video
+      id="weddingVideo"
+      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
+      preload="auto"
+      loop
+      muted
+      playsinline
+      webkit-playsinline
+      crossorigin="anonymous"
+    ></video>
+  </a-assets>
 
-    <!-- Marker Target -->
-    <a-entity mindar-image-target="targetIndex: 0" id="target">
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-plane
-        position="0 0 0.01"
-        width="1"
-        height="1"
-        material="shader: flat; src: #weddingVideo"
-      ></a-plane>
+  <a-entity mindar-image-target="targetIndex: 0" id="target">
+    <a-plane
+      position="0 0 0.01"
+      width="1"
+      height="1"
+      material="shader: flat; src: #weddingVideo"
+    ></a-plane>
+  </a-entity>
 
-    </a-entity>
+</a-scene>
 
-  </a-scene>
+<script>
+const startButton = document.getElementById("startButton");
+const landing = document.getElementById("landing");
+const scene = document.querySelector("#arScene");
+const video = document.querySelector("#weddingVideo");
+const target = document.querySelector("#target");
 
-  <script>
-    const startButton = document.getElementById("startButton");
-    const landing = document.getElementById("landing");
-    const scene = document.querySelector("#arScene");
-    const video = document.querySelector("#weddingVideo");
-    const target = document.querySelector("#target");
+startButton.addEventListener("click", async () => {
+  try {
 
-    startButton.addEventListener("click", async () => {
-      try {
+    landing.style.display = "none";
+    scene.style.display = "block";
 
-        // Unlock video for iOS
-        video.play().then(() => {
-          video.pause();
-        });
+    const mindarSystem = scene.systems["mindar-image-system"];
 
-        landing.style.display = "none";
-        scene.style.display = "block";
+    // Start camera FIRST (important for Android)
+    await mindarSystem.start();
 
-        // Wait until scene fully loads
-        scene.addEventListener("loaded", async () => {
-          const mindarSystem = scene.systems["mindar-image-system"];
-          await mindarSystem.start();
-        });
+    // Unlock video for iOS AFTER camera starts
+    await video.play();
+    video.pause();
 
-      } catch (err) {
-        alert("Camera permission denied or not supported.");
-        console.error(err);
-      }
-    });
+  } catch (err) {
+    alert("Camera permission denied or not supported.");
+    console.error(err);
+  }
+});
 
-    target.addEventListener("targetFound", () => {
-      video.play();
-    });
+target.addEventListener("targetFound", () => {
+  video.play();
+});
 
-    target.addEventListener("targetLost", () => {
-      video.pause();
-    });
-  </script>
+target.addEventListener("targetLost", () => {
+  video.pause();
+});
+</script>
 
 </body>
 </html>
