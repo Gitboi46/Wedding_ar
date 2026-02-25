@@ -46,8 +46,9 @@
       font-weight: bold;
     }
 
+    /* IMPORTANT FIX */
     a-scene {
-      display: none;
+      visibility: hidden; /* NOT display:none */
     }
   </style>
 </head>
@@ -64,7 +65,7 @@
 
 <a-scene
   id="arScene"
-  mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/combinedTargets.mind; autoStart: false;"
+  mindar-image="imageTargetSrc: ./combinedTargets.mind; autoStart: false;"
   color-space="sRGB"
   renderer="colorManagement: true"
   vr-mode-ui="enabled: false"
@@ -75,7 +76,7 @@
 
     <video
       id="video1"
-      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
+      src="./marrage video bite 01.mp4"
       preload="auto"
       playsinline
       webkit-playsinline
@@ -84,7 +85,7 @@
 
     <video
       id="video2"
-      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2002.mp4"
+      src="./marrage video bite 02.mp4"
       preload="auto"
       playsinline
       webkit-playsinline
@@ -95,6 +96,7 @@
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+  <!-- TARGET 1 -->
   <a-entity mindar-image-target="targetIndex: 0" id="target1">
     <a-plane
       id="plane1"
@@ -105,6 +107,7 @@
     ></a-plane>
   </a-entity>
 
+  <!-- TARGET 2 -->
   <a-entity mindar-image-target="targetIndex: 1" id="target2">
     <a-plane
       id="plane2"
@@ -138,7 +141,9 @@ async function startAR() {
 startButton.addEventListener("click", async () => {
 
   landing.style.display = "none";
-  scene.style.display = "block";
+
+  // FIX: use visibility instead of display
+  scene.style.visibility = "visible";
 
   if (scene.hasLoaded) {
     await startAR();
@@ -148,7 +153,6 @@ startButton.addEventListener("click", async () => {
 });
 
 target1.addEventListener("targetFound", async () => {
-
   video2.pause();
   plane1.setAttribute("visible", false);
 
@@ -165,7 +169,6 @@ target1.addEventListener("targetLost", () => {
 });
 
 target2.addEventListener("targetFound", async () => {
-
   video1.pause();
   plane2.setAttribute("visible", false);
 
