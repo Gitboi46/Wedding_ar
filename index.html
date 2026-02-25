@@ -95,7 +95,6 @@
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <!-- TARGET 1 -->
   <a-entity mindar-image-target="targetIndex: 0" id="target1">
     <a-plane
       id="plane1"
@@ -106,7 +105,6 @@
     ></a-plane>
   </a-entity>
 
-  <!-- TARGET 2 -->
   <a-entity mindar-image-target="targetIndex: 1" id="target2">
     <a-plane
       id="plane2"
@@ -133,10 +131,6 @@ const target2 = document.querySelector("#target2");
 const plane1 = document.querySelector("#plane1");
 const plane2 = document.querySelector("#plane2");
 
-// Force video load on start (important for iOS)
-video1.load();
-video2.load();
-
 async function startAR() {
   await scene.systems["mindar-image-system"].start();
 }
@@ -153,15 +147,16 @@ startButton.addEventListener("click", async () => {
   }
 });
 
-// TARGET 1
-target1.addEventListener("targetFound", () => {
+target1.addEventListener("targetFound", async () => {
 
   video2.pause();
+  plane1.setAttribute("visible", false);
 
-  video1.play().then(() => {
+  await video1.play();
+
+  if (video1.readyState >= 2) {
     plane1.setAttribute("visible", true);
-  });
-
+  }
 });
 
 target1.addEventListener("targetLost", () => {
@@ -169,15 +164,16 @@ target1.addEventListener("targetLost", () => {
   plane1.setAttribute("visible", false);
 });
 
-// TARGET 2
-target2.addEventListener("targetFound", () => {
+target2.addEventListener("targetFound", async () => {
 
   video1.pause();
+  plane2.setAttribute("visible", false);
 
-  video2.play().then(() => {
+  await video2.play();
+
+  if (video2.readyState >= 2) {
     plane2.setAttribute("visible", true);
-  });
-
+  }
 });
 
 target2.addEventListener("targetLost", () => {
