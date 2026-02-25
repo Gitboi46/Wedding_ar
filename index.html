@@ -11,8 +11,8 @@
     body {
       margin: 0;
       overflow: hidden;
-      font-family: Arial, sans-serif;
       background: black;
+      font-family: Arial, sans-serif;
     }
 
     #landing {
@@ -44,13 +44,6 @@
       border-radius: 30px;
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transition: 0.3s;
-    }
-
-    #startButton:hover {
-      background: #83a759;
-      color: white;
     }
 
     a-scene {
@@ -65,23 +58,24 @@
   <img 
     id="thumbnail"
     src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/Web%20Home%20Page.png"
-    alt="Wedding AR Thumbnail"
   >
   <button id="startButton">Start AR Experience 💍</button>
 </div>
 
 <a-scene
   id="arScene"
-  mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/target%201.mind; autoStart: false;"
+  mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/targetsboth.mind; autoStart: false;"
   color-space="sRGB"
-  renderer="colorManagement: true, physicallyCorrectLights"
+  renderer="colorManagement: true"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
 >
 
   <a-assets>
+
+    <!-- VIDEO 1 -->
     <video
-      id="weddingVideo"
+      id="video1"
       src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
       preload="auto"
       loop
@@ -89,16 +83,37 @@
       webkit-playsinline
       crossorigin="anonymous"
     ></video>
+
+    <!-- VIDEO 2 -->
+    <video
+      id="video2"
+      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2002.mp4"
+      preload="auto"
+      loop
+      playsinline
+      webkit-playsinline
+      crossorigin="anonymous"
+    ></video>
+
   </a-assets>
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <a-entity mindar-image-target="targetIndex: 0" id="target">
+  <!-- TARGET 1 -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target1">
     <a-plane
-      position="0 0 0.01"
       width="1"
       height="0.6"
-      material="shader: flat; src: #weddingVideo"
+      material="shader: flat; src: #video1"
+    ></a-plane>
+  </a-entity>
+
+  <!-- TARGET 2 -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target2">
+    <a-plane
+      width="1"
+      height="0.6"
+      material="shader: flat; src: #video2"
     ></a-plane>
   </a-entity>
 
@@ -108,40 +123,45 @@
 const startButton = document.getElementById("startButton");
 const landing = document.getElementById("landing");
 const scene = document.querySelector("#arScene");
-const video = document.querySelector("#weddingVideo");
-const target = document.querySelector("#target");
+
+const video1 = document.querySelector("#video1");
+const video2 = document.querySelector("#video2");
+
+const target1 = document.querySelector("#target1");
+const target2 = document.querySelector("#target2");
 
 async function startAR() {
-  const mindarSystem = scene.systems["mindar-image-system"];
-  await mindarSystem.start();
+  await scene.systems["mindar-image-system"].start();
 }
 
 startButton.addEventListener("click", async () => {
-  try {
 
-    landing.style.display = "none";
-    scene.style.display = "block";
+  landing.style.display = "none";
+  scene.style.display = "block";
 
-    if (scene.hasLoaded) {
-      await startAR();
-    } else {
-      scene.addEventListener("loaded", async () => {
-        await startAR();
-      }, { once: true });
-    }
-
-  } catch (err) {
-    alert("Camera permission denied or not supported.");
-    console.error(err);
+  if (scene.hasLoaded) {
+    await startAR();
+  } else {
+    scene.addEventListener("loaded", startAR, { once: true });
   }
 });
 
-target.addEventListener("targetFound", () => {
-  video.play();
+target1.addEventListener("targetFound", () => {
+  video2.pause();
+  video1.play();
 });
 
-target.addEventListener("targetLost", () => {
-  video.pause();
+target1.addEventListener("targetLost", () => {
+  video1.pause();
+});
+
+target2.addEventListener("targetFound", () => {
+  video1.pause();
+  video2.play();
+});
+
+target2.addEventListener("targetLost", () => {
+  video2.pause();
 });
 </script>
 
