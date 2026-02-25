@@ -112,21 +112,31 @@ const scene = document.querySelector("#arScene");
 const video = document.querySelector("#weddingVideo");
 const target = document.querySelector("#target");
 
+async function startAR() {
+  const mindarSystem = scene.systems["mindar-image-system"];
+
+  // Start camera
+  await mindarSystem.start();
+
+  // Unlock video for iOS
+  video.play().then(() => {
+    video.pause();
+  });
+}
+
 startButton.addEventListener("click", async () => {
   try {
 
     landing.style.display = "none";
     scene.style.display = "block";
 
-    const mindarSystem = scene.systems["mindar-image-system"];
-
-    // 1️⃣ Start camera FIRST (Android requirement)
-    await mindarSystem.start();
-
-    // 2️⃣ Unlock video safely (iOS requirement)
-    video.play().then(() => {
-      video.pause();
-    });
+    if (scene.hasLoaded) {
+      await startAR();
+    } else {
+      scene.addEventListener("loaded", async () => {
+        await startAR();
+      }, { once: true });
+    }
 
   } catch (err) {
     alert("Camera permission denied or not supported.");
