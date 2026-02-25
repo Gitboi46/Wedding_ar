@@ -85,7 +85,6 @@
       src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
       preload="auto"
       loop
-      muted
       playsinline
       webkit-playsinline
       crossorigin="anonymous"
@@ -114,14 +113,7 @@ const target = document.querySelector("#target");
 
 async function startAR() {
   const mindarSystem = scene.systems["mindar-image-system"];
-
-  // Start camera
   await mindarSystem.start();
-
-  // Unlock video for iOS
-  video.play().then(() => {
-    video.pause();
-  });
 }
 
 startButton.addEventListener("click", async () => {
