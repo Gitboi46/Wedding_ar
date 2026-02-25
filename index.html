@@ -79,6 +79,7 @@
       src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
       preload="auto"
       loop
+      muted
       playsinline
       webkit-playsinline
       crossorigin="anonymous"
@@ -90,6 +91,7 @@
       src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2002.mp4"
       preload="auto"
       loop
+      muted
       playsinline
       webkit-playsinline
       crossorigin="anonymous"
@@ -130,11 +132,41 @@ const video2 = document.querySelector("#video2");
 const target1 = document.querySelector("#target1");
 const target2 = document.querySelector("#target2");
 
+// Wait until video is actually ready
+function waitForVideoReady(video) {
+  return new Promise(resolve => {
+    if (video.readyState >= 3) {
+      resolve();
+    } else {
+      video.addEventListener("canplaythrough", resolve, { once: true });
+    }
+  });
+}
+
+// Preload + decode warmup
+async function preloadVideos() {
+  video1.load();
+  video2.load();
+
+  await Promise.all([
+    waitForVideoReady(video1),
+    waitForVideoReady(video2)
+  ]);
+
+  // Mobile decode warm-up trick
+  await video1.play().then(() => video1.pause()).catch(() => {});
+  await video2.play().then(() => video2.pause()).catch(() => {});
+}
+
 async function startAR() {
   await scene.systems["mindar-image-system"].start();
 }
 
 startButton.addEventListener("click", async () => {
+
+  startButton.innerText = "Loading...";
+
+  await preloadVideos();
 
   landing.style.display = "none";
   scene.style.display = "block";
@@ -146,6 +178,7 @@ startButton.addEventListener("click", async () => {
   }
 });
 
+// Target Events
 target1.addEventListener("targetFound", () => {
   video2.pause();
   video1.play();
