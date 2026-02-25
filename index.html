@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Wedding AR Experience</title>
+
+  <!-- IMPORTANT for iPhone -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Landing Page */
+    #landing {
+      position: fixed;
+      inset: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 20;
+    }
+
+    /* Thumbnail full screen */
+    #thumbnail {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* iPhone 15 Optimized Button */
+    #startButton {
+      position: absolute;
+      bottom: calc(40px + env(safe-area-inset-bottom));
+      padding: 18px 40px;
+      font-size: 20px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 40px;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #startButton:active {
+      transform: scale(0.95);
+      background: #83a759;
+      color: white;
+    }
+
+    /* AR Scene hidden initially */
+    a-scene {
+      display: none;
+      position: fixed !important;
+      inset: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Landing Page -->
+  <div id="landing">
+    <img 
+      id="thumbnail"
+      src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/Web%20Home%20Page.png"
+      alt="Wedding AR Thumbnail"
+    >
+    <button id="startButton">Start AR Experience 💍</button>
+  </div>
+
+  <!-- AR Scene -->
+  <a-scene
+    id="arScene"
+    mindar-image="imageTargetSrc: https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/target%201.mind; autoStart: false;"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <a-assets>
+      <!-- IMPORTANT: muted required for iPhone autoplay -->
+      <video
+        id="weddingVideo"
+        src="https://raw.githubusercontent.com/Gitboi46/Wedding_ar/main/marrage%20video%20bite%2001.mp4"
+        preload="auto"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- Marker Target -->
+    <a-entity mindar-image-target="targetIndex: 0" id="target">
+
+      <!-- Marker-sized Video -->
+      <a-plane
+        position="0 0 0.01"
+        width="1"
+        height="1"
+        material="shader: flat; src: #weddingVideo"
+      ></a-plane>
+
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    const startButton = document.getElementById("startButton");
+    const landing = document.getElementById("landing");
+    const scene = document.querySelector("#arScene");
+    const video = document.querySelector("#weddingVideo");
+    const target = document.querySelector("#target");
+
+    startButton.addEventListener("click", async () => {
+      try {
+        // iPhone camera permission trigger
+        await navigator.mediaDevices.getUserMedia({ video: true });
+
+        landing.style.display = "none";
+        scene.style.display = "block";
+
+        const mindarSystem = scene.systems["mindar-image-system"];
+        await mindarSystem.start();
+
+      } catch (err) {
+        alert("Camera permission denied or not supported.");
+        console.error(err);
+      }
+    });
+
+    target.addEventListener("targetFound", () => {
+      video.play();
+    });
+
+    target.addEventListener("targetLost", () => {
+      video.pause();
+    });
+  </script>
+
+</body>
+</html>
