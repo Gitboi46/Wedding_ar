@@ -46,6 +46,21 @@
       font-weight: bold;
     }
 
+    #soundButton {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.9);
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 30;
+      display: none;
+    }
+
     a-scene {
       display: none;
     }
@@ -61,6 +76,8 @@
   >
   <button id="startButton">Start AR Experience 💍</button>
 </div>
+
+<button id="soundButton">Enable Sound 🔊</button>
 
 <a-scene
   id="arScene"
@@ -103,26 +120,23 @@
 
   <!-- TARGET 1 -->
   <a-entity mindar-image-target="targetIndex: 0" id="target1">
-    <a-plane
-      width="1"
-      height="0.6"
-      material="shader: flat; src: #video1"
-    ></a-plane>
+    <a-plane width="1" height="0.6"
+      material="shader: flat; src: #video1">
+    </a-plane>
   </a-entity>
 
   <!-- TARGET 2 -->
   <a-entity mindar-image-target="targetIndex: 1" id="target2">
-    <a-plane
-      width="1"
-      height="0.6"
-      material="shader: flat; src: #video2"
-    ></a-plane>
+    <a-plane width="1" height="0.6"
+      material="shader: flat; src: #video2">
+    </a-plane>
   </a-entity>
 
 </a-scene>
 
 <script>
 const startButton = document.getElementById("startButton");
+const soundButton = document.getElementById("soundButton");
 const landing = document.getElementById("landing");
 const scene = document.querySelector("#arScene");
 
@@ -132,50 +146,31 @@ const video2 = document.querySelector("#video2");
 const target1 = document.querySelector("#target1");
 const target2 = document.querySelector("#target2");
 
-// Wait until video is actually ready
-function waitForVideoReady(video) {
-  return new Promise(resolve => {
-    if (video.readyState >= 3) {
-      resolve();
-    } else {
-      video.addEventListener("canplaythrough", resolve, { once: true });
-    }
-  });
-}
-
-// Preload + decode warmup
-async function preloadVideos() {
-  video1.load();
-  video2.load();
-
-  await Promise.all([
-    waitForVideoReady(video1),
-    waitForVideoReady(video2)
-  ]);
-
-  // Mobile decode warm-up trick
-  await video1.play().then(() => video1.pause()).catch(() => {});
-  await video2.play().then(() => video2.pause()).catch(() => {});
-}
-
 async function startAR() {
   await scene.systems["mindar-image-system"].start();
 }
 
 startButton.addEventListener("click", async () => {
 
-  startButton.innerText = "Loading...";
-
-  await preloadVideos();
-
   landing.style.display = "none";
   scene.style.display = "block";
+  soundButton.style.display = "block";
 
   if (scene.hasLoaded) {
     await startAR();
   } else {
     scene.addEventListener("loaded", startAR, { once: true });
   }
+});
+
+// Enable Sound Button
+soundButton.addEventListener("click", () => {
+
+  video1.muted = false;
+  video2.muted = false;
+
+  soundButton.innerText = "Sound On 🔊";
+  soundButton.disabled = true;
 });
 
 // Target Events
